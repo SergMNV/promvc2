@@ -2,8 +2,15 @@
 
 namespace Framework\Router;
 
+use InvalidArgumentException;
+
 final class Route
 {
+    private array $supportedMethods = [
+        'GET',
+        'POST',
+    ];
+
     public readonly string $method;
     public readonly string $path;
     public readonly mixed $handler;
@@ -15,7 +22,10 @@ final class Route
         string $path,
         mixed $handler,
     ) {
-        $this->method = strtoupper($method);
+        if (!in_array($method, $this->supportedMethods)) {
+            throw new InvalidArgumentException($method . ' not supported');
+        }
+        $this->method = $method;
         $this->path = trim($path);
         $this->handler = $handler;
     }

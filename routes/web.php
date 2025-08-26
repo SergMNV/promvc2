@@ -8,7 +8,7 @@ return function (Router $r) {
         '/',
         fn() => 'forward page',
     );
-        $r->addRoute(
+    $r->addRoute(
         'GET',
         '/home',
         fn() => 'home page',

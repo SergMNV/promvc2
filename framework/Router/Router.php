@@ -18,6 +18,9 @@ class Router
 
     public function dispatch(string $method, string $uri): string
     {
+        print $this->normalisePath($uri);
+        echo "<br>";
+
         try {
             $matching = $this->matching($method, $uri);
 
@@ -27,9 +30,17 @@ class Router
                 return call_user_func($matching->handler);
             }
 
-            return 'route not found';
+            $paths = $this->paths();
+
+            if (in_array($uri, $paths)) {
+                return call_user_func($this->dispatchNotAllowed());
+            }
+
+            return call_user_func($this->dispatchNotFound());
         } catch (Exception $e) {
-            return $e->getMessage();
+            echo $e->getMessage();
+            echo "<br>";
+            return call_user_func($this->dispatchServerError());
         }
     }
 
@@ -72,5 +83,21 @@ class Router
         return null;
     }
 
-    private function paths() {}
+    private function paths(): array
+    {
+        $paths = [];
+        foreach ($this->routes as $route) {
+            $paths[] = $route->path;
+        }
+
+        return $paths;
+    }
+
+    private function normalisePath(string $path): string
+    {
+        $path = trim($path);
+        $path = preg_replace('#/{2,}#', '/', $path);
+        // return "/{$path}/";
+        return $path;
+    }
 }
